@@ -96,17 +96,13 @@ def get_drinks():
 
 
 # Error Handling
-'''
-Example error handling for unprocessable entity
-'''
-
-
+# 1. Error 422
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
         "success": False,
         "error": 422,
-        "message": "unprocessable"
+        "message": "UNPROCESSABLE Request"
     }), 422
 
 
