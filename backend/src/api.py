@@ -11,22 +11,42 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-'''
 # db_drop_and_create_all()
 
-## ROUTES
+# ROUTES
+# 1. GET Drinks
 '''
-@TODO implement endpoint
     GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+
+    Description:
+        A public endpoint that calls the method get_drinks.
+        Method get_drinks returns  a list of
+        all drinks currently available in the database.
+    Output:
+        - Status code : 200
+        - json response :
+            {
+                "success" : True,
+                "drinks"  : drinks_formated,
+            }
+        - In case of failure expect status code 404
 '''
+
+
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    # Query all drinks stored in Database
+    drinks = Drink.query.order_by(Drink.id).all()
+    # Check if query result is empty
+    if len(drinks) == 0:
+        abort(404)
+    # format drinks to short format
+    drinks_formated = [drink.short() for drink in drinks]
+    # format json response
+    return jsonify({
+        "success": True,
+        "drinks": drinks_formated,
+    })
 
 
 '''
@@ -75,17 +95,20 @@ CORS(app)
 '''
 
 
-## Error Handling
+# Error Handling
 '''
 Example error handling for unprocessable entity
 '''
+
+
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False, 
-                    "error": 422,
-                    "message": "unprocessable"
-                    }), 422
+        "success": False,
+        "error": 422,
+        "message": "unprocessable"
+    }), 422
+
 
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
