@@ -49,14 +49,42 @@ def get_drinks():
     })
 
 
+# 2. GET Drinks
 '''
-@TODO implement endpoint
     GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+
+    Description:
+        A private endpoint that requires 
+        the 'get:drinks-detail' permission.
+        It calls the method drink_recipe.
+        Method drink_recipe returns  a list of
+        all drinks currently available in the database
+        in the long format.
+    Output:
+        - Status code : 200
+        - json response :
+            {
+                "success" : True,
+                "drinks"  : drinks_formated,
+            }
+        - In case of failure expect status code 404
 '''
+
+
+@app.route('/drinks-detail', methods=['GET'])
+def drink_recipe():
+    # Query all drinks stored in Database
+    drinks = Drink.query.order_by(Drink.id).all()
+    # Check if query result is empty
+    if len(drinks) == 0:
+        abort(404)
+    # format drinks to long format
+    drinks_formated = [drink.long() for drink in drinks]
+    # format json response
+    return jsonify({
+        "success": True,
+        "drinks": drinks_formated,
+    })
 
 
 '''
