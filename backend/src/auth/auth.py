@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+AUTH0_DOMAIN = 'se-fsnd.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = os.getenv("API_AUDIENCE")
+API_AUDIENCE = 'http://localhost:5000'
 
 # AuthError Exception
 '''
