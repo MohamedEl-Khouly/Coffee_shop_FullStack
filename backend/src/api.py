@@ -115,7 +115,7 @@ def get_drinks():
 
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth(permission='get:drinks-detail')
-def drink_recipe():
+def drink_recipe(jwt):
     # Query all drinks stored in Database
     drinks = Drink.query.order_by(Drink.id).all()
     # Check if query result is empty
@@ -155,7 +155,7 @@ def drink_recipe():
 
 @app.route("/drinks", methods=['POST'])
 @requires_auth(permission='post:drinks')
-def create_drink():
+def create_drink(jwt):
     # read the json data form body request
     body = request.get_json()
     # check all parts are available
@@ -202,7 +202,7 @@ def create_drink():
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth(permission='patch:drinks')
-def edit_drink(drink_id):
+def edit_drink(jwt, drink_id):
     # query for drink
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     # check if drink found
@@ -253,7 +253,7 @@ def edit_drink(drink_id):
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth(permission='delete:drinks')
-def remove_drink(drink_id):
+def remove_drink(jwt, drink_id):
     # query for drink
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     # check if drink found
