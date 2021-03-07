@@ -96,6 +96,20 @@ def get_drinks():
 
 
 # Error Handling
+'''
+    Error Handlers
+        For each error the error handlers compose
+        a suitable JSON respone that describe that error.
+
+    Response format
+        {
+            "success" : False,
+            "error" : status code,
+            "message" : error description
+        } 
+'''
+
+
 # 1. Error 422
 @app.errorhandler(422)
 def unprocessable(error):
@@ -106,24 +120,31 @@ def unprocessable(error):
     }), 422
 
 
-'''
-@TODO implement error handlers using the @app.errorhandler(error) decorator
-    each error handler should return (with approprate messages):
-             jsonify({
-                    "success": False, 
-                    "error": 404,
-                    "message": "resource not found"
-                    }), 404
-
-'''
-
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above 
-'''
+# 2. Error 400
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": "Bad Request"
+    }), 400
 
 
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above 
-'''
+# 3. Error 404
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "Resource Not Found"
+    }), 404
+
+
+# 4. Auth Error
+@app.errorhandler(AuthError)
+def authentication_failed(error):
+    return jsonify({
+        'success': False,
+        'error': error.status_code,
+        "description": error.error['description'],
+    }), error.status_code
