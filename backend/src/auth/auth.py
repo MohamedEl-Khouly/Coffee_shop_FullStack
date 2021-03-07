@@ -169,15 +169,16 @@ def verify_decode_jwt(token):
     }, 400)
 
 
+# Authentication decorater
 '''
-@TODO implement @requires_auth(permission) decorator method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-
-    it should use the get_token_auth_header method to get the token
-    it should use the verify_decode_jwt method to decode the jwt
-    it should use the check_permissions method validate claims and check the requested permission
-    return the decorator which passes the decoded payload to the decorated method
+    requires_auth
+        Inputs:
+            permission : the permission required by the route
+        Output :
+            payload : in case of authentication and authorization folfiled
+        Description:
+            decorater method integrates methods defined above
+            to handel  authentication and authorization required.
 '''
 
 
