@@ -173,7 +173,7 @@ def create_drink():
         abort(422)
 
 
-# 3. PATCH /Drinks/<id>
+# 3. PATCH Drinks
 '''
     PATCH /drinks/<id>
 
@@ -224,16 +224,43 @@ def edit_drink(drink_id):
     })
 
 
+# 5. DELETE Drink
 '''
-@TODO implement endpoint
     DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+
+    Description:
+        A private endpoint that requires
+        the 'delete:drinks' permission and 
+        an id that is available in DataBase.
+        It calls the method remove_drink.
+        Method remove_drink validates the body
+        of the request , retrives the data corresponding
+        to the id from the database, deletes it and commits
+        it to the DataBase. The method returns the deleted drink id.
+    Output:
+        - Status code : 200
+        - json response :
+            {
+                "success" : True,
+                "delete"  : drink_id,
+            }
+        - In case of failure expect status code 401, 403, 404
 '''
+
+
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+def remove_drink(drink_id):
+    # query for drink
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    # check if drink found
+    if drink is None:
+        abort(404)
+    # delete drink
+    drink.delete()
+    return jsonify({
+        'success': True,
+        'delete': drink_id
+    })
 
 
 # Error Handling
