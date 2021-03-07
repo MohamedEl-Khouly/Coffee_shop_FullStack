@@ -148,7 +148,7 @@ def drink_recipe():
                 "success" : True,
                 "drinks"  : drink_formated,
             }
-        - In case of failure expect status code 400,402
+        - In case of failure expect status code 400,422
 '''
 
 
@@ -173,17 +173,55 @@ def create_drink():
         abort(422)
 
 
+# 3. PATCH /Drinks/<id>
 '''
-@TODO implement endpoint
     PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+
+    Description:
+        A private endpoint that requires
+        the 'patch:drinks' permission and 
+        an id that is available in DataBase.
+        It calls the method edit_drink.
+        Method edit_drink validates the body
+        of the request , retrives the data corresponding
+        to the id from the database, updates it and commits
+        it to the DataBase. The method returns
+        the updated drink in the long format.
+    Output:
+        - Status code : 200
+        - json response :
+            {
+                "success" : True,
+                "drinks"  : drink_formated,
+            }
+        - In case of failure expect status code 401, 403, 400, 422
 '''
+
+
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def edit_drink(drink_id):
+    # query for drink
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    # check if drink found
+    if drink is None:
+        abort(404)
+    # read request body
+    body = request.get_json()
+    # check body data
+    if ('title' in body or 'recipe' in body):
+        if 'title' in body:
+            drink.title = body['title']
+        if 'recipe' in body:
+            recipe = get_recipe(body)
+            drink.recipe = json.dumps(recipe)
+    else:
+        abort(422)
+    # commit to database
+    drink.update()
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
 
 
 '''
