@@ -13,6 +13,48 @@ CORS(app)
 
 # db_drop_and_create_all()
 
+
+# Helper Methods
+# 1. get_recipe
+'''
+    get_recipe
+
+    Inputs:
+        - body: The JSON body of the request
+    Outputs:
+        - recipe: A list of dictionaries describing
+                  each component of the recipe.
+    Description:
+        A private helper method used in post and 
+        patch routes to format the recipe item of the
+        object before submitting in the DataBase
+    Errors expected:
+        - Status code 422
+'''
+
+
+def get_recipe(body):
+    recipe = []
+    recipe_body = body['recipe']
+    recipe_type = type(recipe_body)
+    if recipe_type == list:
+        for element in recipe_body:
+            recipe.append({
+                'color': element['color'],
+                'name': element['name'],
+                'parts': element['parts']
+            })
+    elif recipe_type == dict:
+        recipe.append({
+            'color': recipe_body['color'],
+            'name': recipe_body['name'],
+            'parts': recipe_body['parts']
+        })
+    else:
+        abort(422)
+    return recipe
+
+
 # ROUTES
 # 1. GET Drinks
 '''
@@ -49,7 +91,7 @@ def get_drinks():
     })
 
 
-# 2. GET Drinks
+# 2. GET Drinks-detail
 '''
     GET /drinks-detail
 
@@ -87,15 +129,48 @@ def drink_recipe():
     })
 
 
+# 3. POST Drinks
 '''
-@TODO implement endpoint
     POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+
+    Description:
+        A private endpoint that requires
+        the 'post:drinks' permission.
+        It calls the method create_drink.
+        Method create_drink validates the drink
+        data , creates a new Object and commits
+        it to the DataBase. The method returns
+        the newly created drink currently in the long format.
+    Output:
+        - Status code : 200
+        - json response :
+            {
+                "success" : True,
+                "drinks"  : drink_formated,
+            }
+        - In case of failure expect status code 400,402
 '''
+
+
+@app.route("/drinks", methods=['POST'])
+def create_drink():
+    # read the json data form body request
+    body = request.get_json()
+    # check all parts are available
+    if not('title' in body and 'recipe' in body):
+        abort(400)
+    # read data and commit
+    try:
+        title = body['title']
+        recipe = get_recipe(body)
+        drink = Drink(title=title, recipe=json.dumps(recipe))
+        drink.insert()
+        return jsonify({
+            'success': True,
+            'drinks': drink.long()
+        })
+    except:
+        abort(422)
 
 
 '''
